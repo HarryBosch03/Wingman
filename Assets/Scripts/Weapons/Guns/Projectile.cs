@@ -31,7 +31,7 @@ public sealed class Projectile : MonoBehaviour
         Ray ray = new Ray(rigidbody.position, rigidbody.velocity);
         if (Physics.SphereCast(ray, collisionSize, out RaycastHit hit, speed * Time.deltaTime + 0.01f, collisionMask))
         {
-            Instantiate(hitPrefab, hit.point, Quaternion.Euler(hit.normal));
+            Instantiate(hitPrefab, hit.point, Quaternion.LookRotation(hit.normal));
             Destroy(gameObject);
         }
     }

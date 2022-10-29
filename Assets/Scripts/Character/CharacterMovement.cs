@@ -73,7 +73,7 @@ public sealed class CharacterMovement : MonoBehaviour
         {
             float gravity = Vector3.Dot(Vector3.down, GetGravity());
             float jumpForce = Mathf.Sqrt(2.0f * gravity * jumpHeight);
-            DrivingRigidbody.velocity = new Vector3(DrivingRigidbody.velocity.x, jumpForce, DrivingRigidbody.velocity.y);
+            DrivingRigidbody.velocity = new Vector3(DrivingRigidbody.velocity.x, jumpForce, DrivingRigidbody.velocity.z);
         }
     }
 

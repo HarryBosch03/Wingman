@@ -115,6 +115,37 @@ Transform:
   m_Father: {fileID: 952867896973188592}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1856547989808201000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1733750091532991622}
+  m_Layer: 3
+  m_Name: Muzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1733750091532991622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1856547989808201000}
+  m_LocalRotation: {x: -0.7071066, y: 1.932282e-12, z: 3.9790396e-13, w: 0.70710707}
+  m_LocalPosition: {x: 0, y: 0.2036, z: -0.0478}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6366301563749448151}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1886813049593094706
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,6 +159,7 @@ GameObject:
   - component: {fileID: 3944963525729167544}
   - component: {fileID: 757467533424838218}
   - component: {fileID: 2579361939183639158}
+  - component: {fileID: 3702397587159768132}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -163,8 +195,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e74dbae174aafc64684736c65b999e44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponEffect: {fileID: 0}
-  delay: 0
+  weaponEffect: {fileID: 3944963525729167544}
+  firerate: 600
 --- !u!114 &3944963525729167544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,10 +209,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45672d8f2a3d15e49ba6bb8df55e67fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponAmmo: {fileID: 0}
-  projectile: {fileID: 0}
-  muzzle: {fileID: 0}
-  projectileCount: 0
+  weaponAmmo: {fileID: 757467533424838218}
+  projectile: {fileID: 700887254627020311, guid: 5186071157621934e994191187345633, type: 3}
+  muzzle: {fileID: 1733750091532991622}
+  projectileCount: 1
   spray: 0
 --- !u!114 &757467533424838218
 MonoBehaviour:
@@ -194,9 +226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 096a1ed167f068247b0b5f4b5c62c7d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  magazineSize: 0
-  currentMagazine: 0
-  reloadTime: 0
+  magazineSize: 7
+  currentMagazine: 7
+  reloadTime: 1.5
 --- !u!114 &2579361939183639158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,7 +242,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   root: {fileID: 6366301563749448151}
-  slide: {fileID: 0}
   idleTranslation:
     x: {fileID: 0}
     y: {fileID: 0}
@@ -227,10 +258,56 @@ MonoBehaviour:
     x: {fileID: 0}
     y: {fileID: 0}
     z: {fileID: 0}
-  slideRackOffset: {x: 0, y: 0, z: 0}
   weaponSway: 2
   weaponSwaySmoothing: 0.1
   groundedSmoothing: 0.1
+  shootImpulseA: {x: 0, y: 4, z: 0}
+  shootImpulseB: {x: 0, y: 4, z: 0}
+  shootTorqueA: {x: -150, y: -400}
+  shootTorqueB: {x: 150, y: -400}
+  recenteringForce: 1500
+  recenteringDrag: 30
+  animator: {fileID: 4552459783091509922}
+  reloadAnimationName: Reload
+--- !u!114 &3702397587159768132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886813049593094706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f969be997a639ac4c81f9f3152921f1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adsSpeed: 0.125
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  animator: {fileID: 4552459783091509922}
+  adsParameterName: ads
 --- !u!1 &2138397670318623041
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +501,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapons:
-  - {fileID: 1572843633923644097}
+  - {fileID: 1886813049593094706}
 --- !u!1 &8108037267575059735
 GameObject:
   m_ObjectHideFlags: 0

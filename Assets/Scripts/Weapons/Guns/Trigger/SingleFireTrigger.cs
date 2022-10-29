@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,9 +8,11 @@ using UnityEngine;
 public sealed class SingleFireTrigger : WeaponTrigger
 {
     [Space]
-    [SerializeField] float delay;
+    [SerializeField] float firerate;
 
     float lastFireTime;
+
+    public override event Action UseEvent;
 
     public override bool UseState
     {
@@ -17,8 +20,9 @@ public sealed class SingleFireTrigger : WeaponTrigger
         set
         {
             base.UseState = value;
-            if (value && Time.time > lastFireTime + delay)
+            if (value && Time.time > lastFireTime + 60.0f / firerate)
             {
+                UseEvent?.Invoke();
                 weaponEffect.Execute();
                 lastFireTime = Time.time;
             }

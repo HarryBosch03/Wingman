@@ -7,6 +7,8 @@ using UnityEngine;
 public abstract class WeaponTrigger : MonoBehaviour
 {
     [SerializeField] protected WeaponEffect weaponEffect;
-    
+
+    public abstract event System.Action UseEvent;
+
     public virtual bool UseState { get; set; }
 }

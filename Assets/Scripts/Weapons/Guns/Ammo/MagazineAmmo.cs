@@ -13,6 +13,8 @@ public sealed class MagazineAmmo : WeaponAmmo
 
     bool reloading;
 
+    public override event Action ReloadEvent;
+
     public override bool Reload
     {
         get => base.Reload;
@@ -30,6 +32,8 @@ public sealed class MagazineAmmo : WeaponAmmo
 
         reloading = true;
         currentMagazine = 0;
+
+        ReloadEvent?.Invoke();
 
         yield return new WaitForSeconds(reloadTime);
 
