@@ -10,9 +10,11 @@ public sealed class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject avatarPrefab;
 
+    PlayerInput input;
     Vector2 moveInput;
-
+    
     public GameObject Avatar { get; private set; }
+    public static HashSet<object> InputBlockers { get; } = new HashSet<object>();
 
     public void Spawn (Vector3 point, bool force = false)
     {
@@ -35,37 +37,56 @@ public sealed class PlayerController : MonoBehaviour
     
     public void OnJump (InputValue value)
     {
-        if (!Avatar) return;
-
-        if (Avatar.TryGetComponent(out CharacterMovement movement))
-        {
-            movement.JumpState = value.Get<float>() > 0.5f;
-        }
+        SetStateOnAvatarComponent<CharacterMovement>((m, v) => m.JumpState = v, value);
     }
 
     public void OnShoot(InputValue value)
     {
-        if (!Avatar) return;
-
-        if (Avatar.TryGetComponent(out WeaponManager weaponManager))
-        {
-            weaponManager.UseState = value.Get<float>() > 0.5f;
-        }
+        SetStateOnAvatarComponent<WeaponManager>((wm, v) => wm.UseState = v, value);
     }
 
     public void OnReload(InputValue value)
     {
+        SetStateOnAvatarComponent<WeaponManager>((wm, v) => wm.ReloadState = v, value);
+    }
+
+    public void OnAim(InputValue value)
+    {
+        SetStateOnAvatarComponent<WeaponManager>((wm, v) => wm.AimState = v, value);
+    }
+
+    public void SetStateOnAvatarComponent<T> (System.Action<T, bool> method, InputValue value)
+    {
         if (!Avatar) return;
 
-        if (Avatar.TryGetComponent(out WeaponManager weaponManager))
+        T component = Avatar.GetComponentInChildren<T>();
+        if (component != null)
         {
-            weaponManager.ReloadState = value.Get<float>() > 0.5f;
+            method(component, value.Get<float>() > 0.5f);
         }
+    }
+
+    private void Awake()
+    {
+        input = GetComponent<PlayerInput>();
     }
 
     private void Update()
     {
         UpdateAvatar();
+
+        if (input)
+        {
+            input.enabled = InputBlockers.Count == 0;
+        }
+
+        if (Avatar)
+        {
+            if (Avatar.TryGetComponent(out FPCameraController cameraController))
+            {
+                cameraController.enabled = InputBlockers.Count == 0;
+            }
+        }
 
         if (Keyboard.current.numpad7Key.wasPressedThisFrame)
         {

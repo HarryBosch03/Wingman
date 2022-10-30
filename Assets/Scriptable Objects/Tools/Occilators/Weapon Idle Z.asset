@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Weapon Idle Z
   m_EditorClassIdentifier: 
   frequency: 0.5
-  amplitude: 0.003
+  amplitude: 0.001
   hOffset: 0
   vOffset: 0
   abs: 0

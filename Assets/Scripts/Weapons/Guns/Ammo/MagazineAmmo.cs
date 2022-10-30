@@ -11,9 +11,9 @@ public sealed class MagazineAmmo : WeaponAmmo
     [SerializeField] int currentMagazine;
     [SerializeField] float reloadTime;
 
-    bool reloading;
-
     public override event Action ReloadEvent;
+
+    public int CurrentMagazine => currentMagazine;
 
     public override bool Reload
     {
@@ -27,23 +27,23 @@ public sealed class MagazineAmmo : WeaponAmmo
 
     private IEnumerator ReloadRoutine()
     {
-        if (reloading) yield break;
+        if (Reloading) yield break;
         if (currentMagazine >= magazineSize) yield break;
 
-        reloading = true;
+        Reloading = true;
         currentMagazine = 0;
 
         ReloadEvent?.Invoke();
 
         yield return new WaitForSeconds(reloadTime);
 
-        reloading = false;
+        Reloading = false;
         currentMagazine = magazineSize;
     }
 
     public override bool TryFire()
     {
-        if (reloading) return false;
+        if (Reloading) return false;
         if (currentMagazine <= 0) return false;
 
         currentMagazine--;

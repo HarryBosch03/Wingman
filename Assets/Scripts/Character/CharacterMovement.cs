@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -22,6 +23,14 @@ public sealed class CharacterMovement : MonoBehaviour
     [SerializeField] float groundCheckOffset;
     [SerializeField] LayerMask groundCheckMask;
 
+    [Space]
+    [SerializeField] Transform top;
+    [SerializeField] float topTargetHeight;
+    [SerializeField] float topSpring;
+
+    float topHeight;
+    bool previousJumpState;
+
     public float MoveSpeed => moveSpeed;
     public Rigidbody DrivingRigidbody { get; private set; }
 
@@ -40,12 +49,19 @@ public sealed class CharacterMovement : MonoBehaviour
 
         MoveCharacter();
 
-        if (JumpState)
+        if (JumpState && !previousJumpState)
         {
             Jump();
         }
+        previousJumpState = JumpState;
 
         ApplyGravity();
+    }
+
+    private void Update()
+    {
+        topHeight += (transform.position.y + topTargetHeight - topHeight) * topSpring * Time.deltaTime;
+        top.transform.position = new Vector3(transform.position.x, topHeight, transform.position.z);
     }
 
     private void ApplyGravity()

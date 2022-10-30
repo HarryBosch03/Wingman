@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f31b7dd0d12ef4b910b5b3ece75749, type: 3}
   m_Name: Weapon Run Z
   m_EditorClassIdentifier: 
-  frequency: 3
-  amplitude: 0.01
+  frequency: 4
+  amplitude: 0.002
   hOffset: 0
   vOffset: 0
-  abs: 1
+  abs: 0
   inv: 0

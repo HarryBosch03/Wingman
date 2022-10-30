@@ -2,7 +2,7 @@ using UnityEngine;
 
 [SelectionBase]
 [DisallowMultipleComponent]
-public sealed class WeaponAnimator : MonoBehaviour
+public class WeaponAnimator : MonoBehaviour
 {
     public Transform root;
 
@@ -36,12 +36,13 @@ public sealed class WeaponAnimator : MonoBehaviour
     [Space]
     public Animator animator;
     public string reloadAnimationName;
+    public float reloadAnimationBlend;
 
     FPCameraController cameraController;
     CharacterMovement movement;
 
-    WeaponTrigger trigger;
-    WeaponAmmo ammo;
+    protected WeaponEffect effect;
+    protected WeaponAmmo ammo;
 
     Vector2 lastCamRotation;
     Vector2 swayPosition;
@@ -56,28 +57,28 @@ public sealed class WeaponAnimator : MonoBehaviour
     Vector3 shootVelocity;
     Vector2 shootTorque;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         cameraController = GetComponentInParent<FPCameraController>();
         movement = GetComponentInParent<CharacterMovement>();
 
-        trigger = GetComponent<WeaponTrigger>();
+        effect = GetComponent<WeaponEffect>();
         ammo = GetComponent<WeaponAmmo>();
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
-        trigger.UseEvent += OnUse;
+        effect.ExecuteEvent += OnUse;
         ammo.ReloadEvent += OnReload;
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
-        trigger.UseEvent -= OnUse;
+        effect.ExecuteEvent -= OnUse;
         ammo.ReloadEvent -= OnReload;
     }
 
-    private void OnUse()
+    protected virtual void OnUse()
     {
         shootVelocity += new Vector3
         {
@@ -93,12 +94,12 @@ public sealed class WeaponAnimator : MonoBehaviour
         };
     }
 
-    private void OnReload()
+    protected virtual void OnReload()
     {
-        animator.Play(reloadAnimationName);
+        animator.CrossFade(reloadAnimationName, reloadAnimationBlend);
     }
 
-    private void LateUpdate()
+    protected virtual void LateUpdate()
     {
         ApplyMovementAnimation();
 
@@ -128,7 +129,7 @@ public sealed class WeaponAnimator : MonoBehaviour
         Vector2 camDelta = cameraController.ScreenSpaceRotation - lastCamRotation;
         swayPosition = Vector2.SmoothDamp(swayPosition, camDelta * weaponSway, ref swayVelocity, weaponSwaySmoothing);
 
-        root.rotation *= Quaternion.Euler(swayPosition.y, swayPosition.x, swayPosition.x);
+        root.rotation *= Quaternion.Euler(swayPosition.y, 0.0f, swayPosition.x);
         lastCamRotation = cameraController.ScreenSpaceRotation;
     }
 }

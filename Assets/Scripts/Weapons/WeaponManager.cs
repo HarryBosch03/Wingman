@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 [SelectionBase]
 [DisallowMultipleComponent]
@@ -24,47 +25,40 @@ public sealed class WeaponManager : MonoBehaviour
 
     public bool UseState
     {
-        get
-        {
-            if (!CurrentWeapon) return false;
-
-            if (CurrentWeapon.TryGetComponent(out WeaponTrigger trigger))
-            {
-                return trigger.UseState;
-            }
-            else return false;
-        }
-        set
-        {
-            if (!CurrentWeapon) return;
-
-            if (CurrentWeapon.TryGetComponent(out WeaponTrigger trigger))
-            {
-                trigger.UseState = value;
-            }
-        }
+        get => GetState<WeaponTrigger>((t) => t.UseState);
+        set => GetState<WeaponTrigger>((t) => t.UseState = value);
     }
 
     public bool ReloadState
     {
-        get
-        {
-            if (!CurrentWeapon) return false;
+        get => GetState<WeaponAmmo>((a) => a.Reload);
+        set => GetState<WeaponAmmo>((a) => a.Reload = value);
+    }
 
-            if (CurrentWeapon.TryGetComponent(out WeaponAmmo trigger))
-            {
-                return trigger.Reload;
-            }
-            else return false;
+    public bool AimState
+    {
+        get => GetState<WeaponADS>((a) => a.ADSState);
+        set => GetState<WeaponADS>((a) => a.ADSState = value);
+    }
+
+    public bool GetState<T>(System.Func<T, bool> method)
+    {
+        if (!CurrentWeapon) return false;
+
+        if (CurrentWeapon.TryGetComponent(out T component))
+        {
+            return method(component);
         }
-        set
-        {
-            if (!CurrentWeapon) return;
+        else return false;
+    }
 
-            if (CurrentWeapon.TryGetComponent(out WeaponAmmo trigger))
-            {
-                trigger.Reload = value;
-            }
+    public void SetState<T>(System.Action<T> method)
+    {
+        if (!CurrentWeapon) return;
+
+        if (CurrentWeapon.TryGetComponent(out T component))
+        {
+            method(component);
         }
     }
 

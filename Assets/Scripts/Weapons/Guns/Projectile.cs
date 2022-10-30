@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
@@ -19,6 +17,8 @@ public sealed class Projectile : MonoBehaviour
 
     new Rigidbody rigidbody;
 
+    public GameObject Shooter { get; set; }
+
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -31,6 +31,12 @@ public sealed class Projectile : MonoBehaviour
         Ray ray = new Ray(rigidbody.position, rigidbody.velocity);
         if (Physics.SphereCast(ray, collisionSize, out RaycastHit hit, speed * Time.deltaTime + 0.01f, collisionMask))
         {
+            Health health = hit.transform.GetComponentInParent<Health>();
+            if (health)
+            {
+                health.Damage(new DamageArgs(Shooter, damage));
+            }
+
             Instantiate(hitPrefab, hit.point, Quaternion.LookRotation(hit.normal));
             Destroy(gameObject);
         }
