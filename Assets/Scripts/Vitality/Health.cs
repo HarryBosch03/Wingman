@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
@@ -22,6 +20,8 @@ public sealed class Health : MonoBehaviour
     public float CurrentDoom => currentDoom * maxHealth;
     public float MaxHealth => maxHealth;
     public float LastDamageTime { get; private set; }
+
+    public static event System.EventHandler<DamageArgs> RecieveDamageEvent;
 
     private void Update()
     {
@@ -45,6 +45,8 @@ public sealed class Health : MonoBehaviour
         if (currentDoom > 1.0f) currentDoom = 1.0f;
 
         LastDamageTime = Time.time;
+
+        RecieveDamageEvent?.Invoke(this, args);
     }
 
     private void Die(DamageArgs args)

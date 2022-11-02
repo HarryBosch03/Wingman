@@ -17,6 +17,7 @@ public class WeaponAnimator : MonoBehaviour
     [Space]
     public float weaponSway;
     public float weaponSwaySmoothing;
+    public AnimationCurve weaponSwayRemap;
 
     [Space]
     public float groundedSmoothing;
@@ -68,13 +69,13 @@ public class WeaponAnimator : MonoBehaviour
 
     protected virtual void OnEnable()
     {
-        effect.ExecuteEvent += OnUse;
+        effect.PreExecuteEvent += OnUse;
         ammo.ReloadEvent += OnReload;
     }
 
     protected virtual void OnDisable()
     {
-        effect.ExecuteEvent -= OnUse;
+        effect.PreExecuteEvent -= OnUse;
         ammo.ReloadEvent -= OnReload;
     }
 
@@ -99,13 +100,8 @@ public class WeaponAnimator : MonoBehaviour
         animator.CrossFade(reloadAnimationName, reloadAnimationBlend);
     }
 
-    protected virtual void LateUpdate()
+    private void FixedUpdate()
     {
-        ApplyMovementAnimation();
-
-        root.localPosition += shootOffset;
-        root.localRotation *= Quaternion.Euler(shootRotation.y, 0.0f, -shootRotation.x);
-
         shootOffset += shootVelocity * Time.deltaTime;
         shootRotation += shootTorque * Time.deltaTime;
 
@@ -114,6 +110,14 @@ public class WeaponAnimator : MonoBehaviour
 
         shootVelocity -= shootVelocity * recenteringDrag * Time.deltaTime;
         shootTorque -= shootTorque * recenteringDrag * Time.deltaTime;
+    }
+
+    protected virtual void LateUpdate()
+    {
+        ApplyMovementAnimation();
+
+        root.localPosition += shootOffset;
+        root.localRotation *= Quaternion.Euler(shootRotation.y, 0.0f, -shootRotation.x);
     }
 
     private void ApplyMovementAnimation()
@@ -129,7 +133,10 @@ public class WeaponAnimator : MonoBehaviour
         Vector2 camDelta = cameraController.ScreenSpaceRotation - lastCamRotation;
         swayPosition = Vector2.SmoothDamp(swayPosition, camDelta * weaponSway, ref swayVelocity, weaponSwaySmoothing);
 
-        root.rotation *= Quaternion.Euler(swayPosition.y, 0.0f, swayPosition.x);
+        float remapedSwayMagnitude = weaponSwayRemap.Evaluate(swayPosition.magnitude);
+        Vector2 remapedSway = swayPosition.normalized * remapedSwayMagnitude;
+
+        root.rotation *= Quaternion.Euler(remapedSway.y, 0.0f, remapedSway.x);
         lastCamRotation = cameraController.ScreenSpaceRotation;
     }
 }

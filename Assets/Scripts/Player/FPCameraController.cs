@@ -12,7 +12,7 @@ public sealed class FPCameraController : MonoBehaviour
 
     [Space]
     [SerializeField] CinemachineVirtualCamera vcam;
-    [SerializeField] RenderObjects viewmodelRenderObject;
+    [SerializeField] RenderObjects[] viewmodelRenderObjects;
 
     public Vector2 ScreenSpaceRotation { get; private set; }
     public float FOVOverride { get; set; }
@@ -47,6 +47,9 @@ public sealed class FPCameraController : MonoBehaviour
         vcam.m_Lens.FieldOfView = FOVOverride;
         FOVOverride = 90.0f;
 
-        viewmodelRenderObject.settings.cameraSettings.cameraFieldOfView = ViewmodelFOV;
+        foreach (var viewmodelRenderObject in viewmodelRenderObjects)
+        {
+            viewmodelRenderObject.settings.cameraSettings.cameraFieldOfView = ViewmodelFOV;
+        }
     }
 }

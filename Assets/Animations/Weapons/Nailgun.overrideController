@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Nailgun
+  m_Controller: {fileID: 9100000, guid: 39f554aef8c50704eb91cab59d49a700, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 2168832916399369941, guid: 70aa21e22d26edc4486e266999433674, type: 3}
+    m_OverrideClip: {fileID: -6451892222158995447, guid: 319bdae28b607724281e366451c0e400, type: 3}
+  - m_OriginalClip: {fileID: -2433484888829875565, guid: 70aa21e22d26edc4486e266999433674, type: 3}
+    m_OverrideClip: {fileID: 5087841396290448552, guid: 319bdae28b607724281e366451c0e400, type: 3}
+  - m_OriginalClip: {fileID: 5375027265191205981, guid: 70aa21e22d26edc4486e266999433674, type: 3}
+    m_OverrideClip: {fileID: -1017360160696962978, guid: 319bdae28b607724281e366451c0e400, type: 3}
+  - m_OriginalClip: {fileID: -1497476368436209825, guid: 70aa21e22d26edc4486e266999433674, type: 3}
+    m_OverrideClip: {fileID: -1941761755347372915, guid: 319bdae28b607724281e366451c0e400, type: 3}

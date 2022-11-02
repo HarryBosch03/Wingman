@@ -8,13 +8,14 @@ public abstract class WeaponEffect : MonoBehaviour
 {
     [SerializeField] protected WeaponAmmo weaponAmmo;
 
-    public abstract event System.Action ExecuteEvent;
+    public abstract event System.Action PreExecuteEvent;
+    public abstract event System.Action PostExecuteEvent;
 
     public abstract void Execute();
     public float LastExecuteTime { get; protected set; }
 
     protected virtual void Awake ()
     {
-        ExecuteEvent += () => LastExecuteTime = Time.time;
+        PostExecuteEvent += () => LastExecuteTime = Time.time;
     }
 }

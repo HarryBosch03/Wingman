@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [SelectionBase]
 [DisallowMultipleComponent]
@@ -11,32 +6,34 @@ using UnityEngine.Rendering;
 public sealed class CharacterMovement : MonoBehaviour
 {
     [SerializeField] float moveSpeed;
-    [SerializeField] float acceleration;
+    [SerializeField] float groundAcceleration;
+
+    [Space]
+    [SerializeField] float airMoveForce;
 
     [Space]
     [SerializeField] float jumpHeight;
     [SerializeField] float upGravity;
     [SerializeField] float downGravity;
+    [SerializeField] float jumpSpringPauseTime;
 
     [Space]
+    [SerializeField] float springDistance;
+    [SerializeField] float springForce;
+    [SerializeField] float springDamper;
     [SerializeField] float groundCheckRadius;
-    [SerializeField] float groundCheckOffset;
     [SerializeField] LayerMask groundCheckMask;
 
-    [Space]
-    [SerializeField] Transform top;
-    [SerializeField] float topTargetHeight;
-    [SerializeField] float topSpring;
-
-    float topHeight;
     bool previousJumpState;
+    float lastJumpTime;
 
     public float MoveSpeed => moveSpeed;
     public Rigidbody DrivingRigidbody { get; private set; }
 
     public Vector3 MoveDirection { get; set; }
     public bool JumpState { get; set; }
-    public bool IsGrounded { get; private set; }
+    public float DistanceToGround { get; private set; }
+    public bool IsGrounded => DistanceToGround < springDistance;
 
     private void Awake()
     {
@@ -45,7 +42,7 @@ public sealed class CharacterMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        IsGrounded = GetIsGrounded();
+        DistanceToGround = GetDistanceToGround();
 
         MoveCharacter();
 
@@ -55,13 +52,18 @@ public sealed class CharacterMovement : MonoBehaviour
         }
         previousJumpState = JumpState;
 
+        ApplySpring();
         ApplyGravity();
     }
 
-    private void Update()
+    private void ApplySpring()
     {
-        topHeight += (transform.position.y + topTargetHeight - topHeight) * topSpring * Time.deltaTime;
-        top.transform.position = new Vector3(transform.position.x, topHeight, transform.position.z);
+        if (IsGrounded && Time.time > lastJumpTime + jumpSpringPauseTime)
+        {
+            float contraction = 1.0f - (DistanceToGround / springDistance);
+            DrivingRigidbody.velocity += Vector3.up * contraction * springForce * Time.deltaTime;
+            DrivingRigidbody.velocity -= Vector3.up * DrivingRigidbody.velocity.y * springDamper * Time.deltaTime;
+        }
     }
 
     private void ApplyGravity()
@@ -72,24 +74,33 @@ public sealed class CharacterMovement : MonoBehaviour
 
     private void MoveCharacter()
     {
-        Vector3 target = MoveDirection * moveSpeed;
-        Vector3 current = DrivingRigidbody.velocity;
+        if (IsGrounded)
+        {
+            Vector3 target = MoveDirection * moveSpeed;
+            Vector3 current = DrivingRigidbody.velocity;
 
-        Vector3 delta = Vector3.ClampMagnitude(target - current, moveSpeed);
-        delta.y = 0.0f;
+            Vector3 delta = Vector3.ClampMagnitude(target - current, moveSpeed);
+            delta.y = 0.0f;
 
-        Vector3 force = delta / moveSpeed * acceleration;
+            Vector3 force = delta / moveSpeed * groundAcceleration;
 
-        DrivingRigidbody.velocity += force * Time.deltaTime;
+            DrivingRigidbody.velocity += force * Time.deltaTime;
+        }
+        else
+        {
+            DrivingRigidbody.velocity += MoveDirection * airMoveForce * Time.deltaTime;
+        }
     }
 
-    private void Jump ()
+    private void Jump()
     {
         if (IsGrounded)
         {
             float gravity = Vector3.Dot(Vector3.down, GetGravity());
             float jumpForce = Mathf.Sqrt(2.0f * gravity * jumpHeight);
             DrivingRigidbody.velocity = new Vector3(DrivingRigidbody.velocity.x, jumpForce, DrivingRigidbody.velocity.z);
+
+            lastJumpTime = Time.time;
         }
     }
 
@@ -108,23 +119,22 @@ public sealed class CharacterMovement : MonoBehaviour
         return Physics.gravity * scale;
     }
 
-    public bool GetIsGrounded ()
+    public float GetDistanceToGround()
     {
-        foreach (var query in Physics.OverlapSphere(transform.position + Vector3.up * groundCheckOffset, groundCheckRadius, groundCheckMask))
+        if (Physics.SphereCast(DrivingRigidbody.position + Vector3.up * groundCheckRadius, groundCheckRadius, Vector3.down, out var hit, 1000.0f, groundCheckMask))
         {
-            if (query.transform.root != transform.root)
-            {
-                return true;
-            }
+            return hit.distance;
         }
-        return false;
+        else return float.PositiveInfinity;
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = GetIsGrounded() ? Color.green : Color.red;
+        if (!DrivingRigidbody) DrivingRigidbody = GetComponent<Rigidbody>();
+        float dist = GetDistanceToGround();
+        Gizmos.color = dist < springDistance ? Color.green : Color.red;
 
-        Gizmos.DrawSphere(transform.position + Vector3.up * groundCheckOffset, groundCheckRadius);
+        Gizmos.DrawRay(transform.position, Vector3.down * dist);
 
         Gizmos.color = Color.white;
     }

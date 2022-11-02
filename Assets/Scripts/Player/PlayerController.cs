@@ -55,6 +55,11 @@ public sealed class PlayerController : MonoBehaviour
         SetStateOnAvatarComponent<WeaponManager>((wm, v) => wm.AimState = v, value);
     }
 
+    public void OnUseAbility (InputValue value)
+    {
+        SetStateOnAvatarComponent<AbilityManager>((am, v) => am.UseState = v, value);
+    }
+
     public void SetStateOnAvatarComponent<T> (System.Action<T, bool> method, InputValue value)
     {
         if (!Avatar) return;
